@@ -8,9 +8,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class UserDaoFromFile implements Dao {
@@ -20,44 +20,26 @@ public class UserDaoFromFile implements Dao {
     @Override
     public void save(User user) throws IOException {
 
+        List<User> users = getAll();
 
-        Map<String, Integer> mapUsersScore = new HashMap<>();
-
-        try {
-            mapUsersScore = getAll().stream().collect(Collectors.toMap(User::getUsername, User::getScore));
-        } catch (NullPointerException e) {
-        }
-
-        if (mapUsersScore.containsKey(user.getUsername())) {
-            System.out.println("Result updated!");
-        } else {
-            System.out.println("Result added!");
-        }
-
-        mapUsersScore.put(user.getUsername(), user.getScore());
-
-        if (mapUsersScore.size() > 5) {
-            Map.Entry<String, Integer> minEntry = null;
-            for (Map.Entry<String, Integer> result : mapUsersScore.entrySet()) {
-                if (minEntry == null || result.getValue() < minEntry.getValue()) {
-                    minEntry = result;
-                }
-            }
-
-            if (minEntry != null) {
-                mapUsersScore.remove(minEntry.getKey());
+        if (!users.isEmpty()) {
+            User userUpd = users.stream().filter(u -> u.getUsername().equals(user.getUsername())).findFirst().orElse(null);
+            if (userUpd != null) {
+                users.stream().filter(u -> u.getUsername().equals(user.getUsername())).findFirst().ifPresent(u -> u.setScore(user.getScore()));
+                users = sorted(users);
+                writeList(users, true);
+                return;
             }
         }
 
-        StringBuilder builder = new StringBuilder();
+        users.add(user);
+        users = sorted(users);
 
-        for (String username : mapUsersScore.keySet()) {
-            builder.append(username).append(" - ").append(mapUsersScore.get(username)).append("\n");
+        if (users.size() > 5) {
+            users = users.subList(0, 5);
         }
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter("usersScore.txt"));
-        writer.write(builder.toString());
-        writer.close();
+        writeList(users, false);
     }
 
     @Override
@@ -74,7 +56,32 @@ public class UserDaoFromFile implements Dao {
             reader.close();
             return usersFromFIle;
         } catch (Exception e) {
-            return null;
+            return new ArrayList<>();
         }
+    }
+
+    private void writeList(List<User> users, boolean update) throws IOException {
+        StringBuilder builder = new StringBuilder();
+
+        for (User u : users) {
+            builder.append(u.getUsername()).append(" - ").append(u.getScore()).append("\n");
+        }
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter("usersScore.txt"));
+        writer.write(builder.toString());
+        writer.close();
+
+        if (update) {
+            System.out.println("Result updated!");
+        } else {
+            System.out.println("Result added!");
+        }
+    }
+
+    private List<User> sorted(List<User> users) {
+        users = users.stream().sorted(Comparator.comparing(User::getScore))
+                .collect(Collectors.toList());
+        Collections.reverse(users);
+        return users;
     }
 }

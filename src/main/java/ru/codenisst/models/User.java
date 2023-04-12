@@ -2,8 +2,8 @@ package ru.codenisst.models;
 
 public class User {
 
-    private final String username;
-    private final int score;
+    private String username;
+    private int score;
 
     public User(String username, int score) {
         this.username = username;
@@ -16,6 +16,10 @@ public class User {
 
     public int getScore() {
         return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 
     @Override

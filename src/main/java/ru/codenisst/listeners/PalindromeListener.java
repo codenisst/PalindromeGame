@@ -8,15 +8,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class PalindromeListener implements Listener{
+public final class PalindromeListener implements Listener {
 
     private Dao userDao;
     private int score;
     private BufferedReader gameListener;
     private final List<String> enteredWordsOrString = new ArrayList<>();
 
+    /**
+     * Метод запускает "слушатель" игры Палиндром
+     *
+     * @throws IOException
+     */
     @Override
-    public void start() throws IOException {
+    public boolean start() throws IOException {
         System.out.println("The game has begun! \nTo end the game type /stop");
 
         String potentialPalindrome = gameListener.readLine();
@@ -55,6 +60,7 @@ public final class PalindromeListener implements Listener{
             enteredWordsOrString.clear();
             score = 0;
         }
+        return true;
     }
 
     @Override

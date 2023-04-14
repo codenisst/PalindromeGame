@@ -8,6 +8,7 @@ import java.util.List;
 public interface Dao {
 
     void save(User user) throws IOException;
+
     List<User> getAll();
 
 }

@@ -15,8 +15,15 @@ import java.util.stream.Collectors;
 
 public class UserDaoFromFile implements Dao {
 
-    // Сохранение данных в txt-файл ("Список лидеров"). Хранится 5 наибольших результатов.
+    private final String filename;
 
+    public UserDaoFromFile(String filename) {
+        this.filename = filename;
+    }
+
+    /**
+     * Сохранение данных в txt-файл ("Список лидеров"). Хранится 5 наибольших результатов.
+     */
     @Override
     public void save(User user) throws IOException {
 
@@ -42,10 +49,15 @@ public class UserDaoFromFile implements Dao {
         writeList(users, false);
     }
 
+    /**
+     * Возвращает всех хранящихся в бд юзеров
+     *
+     * @return List&lt;{@link User}&gt;
+     */
     @Override
     public List<User> getAll() {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("usersScore.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader(filename));
             List<User> usersFromFIle = new ArrayList<>();
 
             while (reader.ready()) {
@@ -67,7 +79,7 @@ public class UserDaoFromFile implements Dao {
             builder.append(u.getUsername()).append(" - ").append(u.getScore()).append("\n");
         }
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter("usersScore.txt"));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
         writer.write(builder.toString());
         writer.close();
 

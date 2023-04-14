@@ -3,19 +3,22 @@ package ru.codenisst.service;
 import ru.codenisst.listeners.Listener;
 
 import java.io.File;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.lang.reflect.Modifier;
 
 
 public class PackageScanner {
 
-    // данный метод позволяет достаточно удобно расширять функционал проекта. Можно реализовать
-    // дополнительный "слушатель" под иную игру. Для этого нужно описать соответствующий listener
-    // в пакете ru/codenisst/listeners , с соответствующей логикой.
+    /**
+     * Данный метод позволяет достаточно удобно расширять функционал проекта.
+     * Можно реализовать дополнительный "слушатель" под иную игру.
+     * Для этого нужно описать соответствующий listener в пакете {@link ru.codenisst.listeners} , с соответствующей логикой.
+     * "Слушатель" в обязательном порядке должен реализовывать интерфейс {@link Listener}
+     */
     public Map<String, Listener> getMapListenersInPackageListeners() throws Exception {
         String path = "ru/codenisst/listeners";
         String packageName = "ru.codenisst.listeners";
@@ -37,7 +40,7 @@ public class PackageScanner {
                         .substring(filePath.lastIndexOf("\\") + 1)
                         .replace(".class", "");
                 Class<?> clazz = Class.forName(className);
-                if (!Modifier.isAbstract(clazz.getModifiers()) && !clazz.isInterface()) {
+                if (!Modifier.isAbstract(clazz.getModifiers()) && !clazz.isInterface() && Listener.class.isAssignableFrom(clazz)) {
                     classes.add(clazz);
                 }
             }
